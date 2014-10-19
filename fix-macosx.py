@@ -54,12 +54,12 @@ def fixSpotlight ():
         if not item.has_key(key):
           missing_keys.append(key)
 
-      if len(missing_keys) is not 0:
+      if len(missing_keys) != 0:
         print "Preference item %s is missing expected keys (%s), skipping" % (item, missing_keys)
         newItems.append(item)
         continue
 
-      if not item["name"] in DISABLED_ITEMS:
+      if item["name"] not in DISABLED_ITEMS:
         newItems.append(item)
         continue
 
