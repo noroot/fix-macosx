@@ -17,103 +17,43 @@
       </div>
 
       <div class="left">
-
         <h2>How to restore privacy:</h2> 
+        <ul>
+          <li>
+            <p>
+              Uncheck "Spotlight Suggestions" and "Bing Web Searches" in
+              System Preferences &gt; Spotlight &gt; Search Results.</li>
+            </p>
+          </li>
+          <li>
+            <p>
+              Safari only partially respects the system-wide Spotlight Settings, and by default
+              will still send metrics containing a copy of your web searches to Apple; to prevent that, you'll also need to
+              uncheck "Include Spotlight Suggestions" in Safari &gt; Preferences &gt; Search.
+            </p>
+          </li>
+        </ul>
+
         <p class="center">
-          Copy and paste the following code into a terminal. Press enter. Log out and back in. Enjoy your privacy.
+            Alternatively, you can apply the changes automatically using <a href="https://fix-macosx.com/fix-macosx.py">fix-macosx.py</a>.
         </p>
-	<pre><code class="cmd">curl -O <a href="https://fix-macosx.com/fix-macosx.py">https://fix-macosx.com/fix-macosx.py</a> &amp;&amp; /usr/bin/python fix-macosx.py</code></pre>
 
         <div class="spacer"></div>
-        <h2>What does this do?</h2>
-        <pre><code>
-#!/usr/bin/python
-
-from Foundation import NSMutableArray, NSMutableDictionary
-from Foundation import CFPreferencesSynchronize, CFPreferencesCopyValue, CFPreferencesCopyKeyList, CFPreferencesSetValue, CFPreferencesCopyMultiple, CFPreferencesSetMultiple, kCFPreferencesCurrentUser, kCFPreferencesAnyHost
-import os, sys
-
-# We only handle Yosemite's spotlight for now
-majorRelease = int(os.uname()[2].split(".")[0])
-if majorRelease &lt; 14:
-  print "Good news! This version of Mac OS X's Spotlight is not known to invade your privacy."
-  sys.exit(0)
-
-def fixSpotlight ():
-  DISABLED_ITEMS=set(["MENU_WEBSEARCH", "MENU_SPOTLIGHT_SUGGESTIONS"])
-  REQUIRED_ITEM_KEYS=set(["enabled", "name"])
-  BUNDLE_ID="com.apple.Spotlight"
-  PREF_NAME="orderedItems"
-  DEFAULT_VALUE=[
-    {'enabled' : True, 'name' : 'APPLICATIONS'},
-    {'enabled' : False, 'name' : 'MENU_SPOTLIGHT_SUGGESTIONS'},
-    {'enabled' : True, 'name' : 'MENU_CONVERSION'},
-    {'enabled' : True, 'name' : 'MENU_EXPRESSION'},
-    {'enabled' : True, 'name' : 'MENU_DEFINITION'},
-    {'enabled' : True, 'name' : 'SYSTEM_PREFS'},
-    {'enabled' : True, 'name' : 'DOCUMENTS'},
-    {'enabled' : True, 'name' : 'DIRECTORIES'},
-    {'enabled' : True, 'name' : 'PRESENTATIONS'},
-    {'enabled' : True, 'name' : 'SPREADSHEETS'},
-    {'enabled' : True, 'name' : 'PDF'},
-    {'enabled' : True, 'name' : 'MESSAGES'},
-    {'enabled' : True, 'name' : 'CONTACT'},
-    {'enabled' : True, 'name' : 'EVENT_TODO'},
-    {'enabled' : True, 'name' : 'IMAGES'},
-    {'enabled' : True, 'name' : 'BOOKMARKS'},
-    {'enabled' : True, 'name' : 'MUSIC'},
-    {'enabled' : True, 'name' : 'MOVIES'},
-    {'enabled' : True, 'name' : 'FONTS'},
-    {'enabled' : True, 'name' : 'MENU_OTHER'},
-    {'enabled' : False, 'name' : 'MENU_WEBSEARCH'}
-  ]
-
-  items = CFPreferencesCopyValue(PREF_NAME, BUNDLE_ID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
-  newItems = None
-  if items is None or len(items) is 0:
-    # Actual preference values are populated on demand; if the user
-    # hasn't previously configured Spotlight, the preference value
-    # will be unavailable
-    newItems = DEFAULT_VALUE
-  else:
-    newItems = NSMutableArray.new()
-    for item in items:
-      missing_keys = []
-      for key in REQUIRED_ITEM_KEYS:
-        if not item.has_key(key):
-          missing_keys.append(key)
-
-      if len(missing_keys) != 0:
-        print "Preference item %s is missing expected keys (%s), skipping" % (item, missing_keys)
-        newItems.append(item)
-        continue
-
-      if item["name"] not in DISABLED_ITEMS:
-        newItems.append(item)
-        continue
-
-      newItem = NSMutableDictionary.dictionaryWithDictionary_(item)
-      newItem.setObject_forKey_(0, "enabled")
-      newItems.append(newItem)
-
-  CFPreferencesSetValue(PREF_NAME, newItems, BUNDLE_ID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
-  CFPreferencesSynchronize(BUNDLE_ID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
-
-fixSpotlight()
-print "All done. Make sure to log out (and back in) for the changes to take effect."
-</code></pre>
-
+        <h2>Contributing</h2>
+        <p>
+            Spotlight isn't the only Mac OS X Yosemite feature that unnecessarily phones home;
+            a myriad of system and user processes are sending data to Apple in a default configuration,
+            and we want to fix those, too.
+        </p>
+        <p>
+            <a href="https://github.com/fix-macosx/yosemite-phone-home">Yosemite Phone Home</a> is a collaborative
+            project to identify additional data that collected by Apple and other third parties. This
+            work is powered by <a href="https://github.com/fix-macosx/net-monitor">Net-Monitor</a>, our open-source toolkit
+            for auditing phone home behavior system-wide.
+        </p>
       </div>
 
       <div class="right">
-	<h2>What does this fix?</h2>
-	<p>This script modifies the current user's Spotlight preferences, disabling sharing of Spotlight searches with Apple.</p>
-	<p>
-          To make the script's changes yourself &mdash; or undo them &mdash;
-	  uncheck (or check) "Spotlight Suggestions" and "Bing Web Searches" in System Preferences &gt;
-	  Spotlight &gt; Search Results.
-        </p>
-
         <h2>Why do we need this?</h2>
         <p>
           If you've upgraded to Mac OS X Yosemite (10.10) and you're using the default settings, each time you start
@@ -123,22 +63,9 @@ print "All done. Make sure to log out (and back in) for the changes to take effe
         </p>
         <p>
           Mac OS X has always respected user privacy by default, and Mac OS X Yosemite should too. Since it
-	  doesn't, you can use the code to the left to disable the parts of Mac OS X which are invasive to
-	  your privacy.
+          doesn't, you can use the code to the left to disable the parts of Mac OS X which are invasive to
+          your privacy.
         </p>
-
-	<h2>Contributing</h2>
-	<p>
-	  Spotlight isn't the only Mac OS X Yosemite feature that unnecessarily phones home;
-	  a myriad of system and user processes are sending data to Apple in a default configuration,
-	  and we want to fix those, too.
-	</p>
-	<p>
-	  <a href="https://github.com/fix-macosx/yosemite-phone-home">Yosemite Phone Home</a> is a collaborative
-	  project to identify additional data that collected by Apple and other third parties. This
-	  work is powered by <a href="https://github.com/fix-macosx/net-monitor">Net-Monitor</a>, our open-source toolkit
-	  for auditing phone home behavior system-wide.
-	</p>
 
 	<!--
         <h2>In the Media</h2>
@@ -179,34 +106,31 @@ print "All done. Make sure to log out (and back in) for the changes to take effe
             </a>
           </li>
         </ul>
-
-        <div class="spacer"></div>
 	-->
-
-        <div class="spacer"></div>
-	<h2>Contact</h2>
-        <p class="center">
-          <a href="https://github.com/fix-macosx/">Github</a> &bull; <a href="https://twitter.com/landonfuller">Twitter</a>
-        </p>
-
-        <div class="spacer"></div>
-        <p class="small">
-	  This site is a Mac OS X fork of <a href="https://fixubuntu.com">fixubuntu.com</a>. Prior
-	  to Ubuntu 14.10, Ubuntu's Dash feature behaved identically to Spotlight in Mac OS X Yosemite. In
-	  Ubuntu 14.10, however, Canonical switched Ubuntu to an <em>opt-in</em> model.
-        </p>
-
-
       </div>
 
+      <div class="spacer"></div>
       <div class="clear"></div>
+    
+
+
+      <div class="spacer"></div>
+      <p class="disclaimer small">
+          
+      </p>
 
       <p class="disclaimer small">
         <strong>Disclaimer:</strong> Please be aware that this site is not affiliated with or
 	approved by Apple, Inc. This site describes certain privacy-invading features of Mac OS
 	X and how to fix them; our use of the trademarked term "Mac OS X" is plainly
 	descriptive &mdash; it helps the public find this site and understand its
-	message.
+	message. This site is a Mac OS X fork of <a href="https://fixubuntu.com">fixubuntu.com</a>. Prior
+  to Ubuntu 14.10, Ubuntu's Dash feature behaved identically to Spotlight in Mac OS X Yosemite. In
+  Ubuntu 14.10, however, Canonical switched Ubuntu to an <em>opt-in</em> model.
+      </p>
+      
+      <p class="center">
+        <a href="https://github.com/fix-macosx/">Github</a> &bull; <a href="https://twitter.com/landonfuller">Twitter</a>
       </p>
 
     </div>
