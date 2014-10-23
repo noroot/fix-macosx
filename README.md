@@ -1,4 +1,4 @@
-# Fix Mac OS X 
+# Fix Mac OS X (Fixed default values)
 
 This is the code that powers <https://fix-macosx.com/>.
 
