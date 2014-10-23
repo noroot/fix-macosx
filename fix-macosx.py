@@ -11,7 +11,7 @@ if majorRelease < 14:
   sys.exit(0)
 
 def fixSpotlight ():
-  DISABLED_ITEMS=set(["MENU_WEBSEARCH", "MENU_SPOTLIGHT_SUGGESTIONS"])
+  DISABLED_ITEMS=set(["MENU_WEBSEARCH", "MENU_SPOTLIGHT_SUGGESTIONS", "OTHER", "BOOKMARKS", "MESSAGES"])
   REQUIRED_ITEM_KEYS=set(["enabled", "name"])
   BUNDLE_ID="com.apple.Spotlight"
   PREF_NAME="orderedItems"
@@ -27,15 +27,15 @@ def fixSpotlight ():
     {'enabled' : True, 'name' : 'PRESENTATIONS'},
     {'enabled' : True, 'name' : 'SPREADSHEETS'},
     {'enabled' : True, 'name' : 'PDF'},
-    {'enabled' : True, 'name' : 'MESSAGES'},
+    {'enabled' : False, 'name' : 'MESSAGES'},
     {'enabled' : True, 'name' : 'CONTACT'},
     {'enabled' : True, 'name' : 'EVENT_TODO'},
     {'enabled' : True, 'name' : 'IMAGES'},
-    {'enabled' : True, 'name' : 'BOOKMARKS'},
+    {'enabled' : False, 'name' : 'BOOKMARKS'},
     {'enabled' : True, 'name' : 'MUSIC'},
     {'enabled' : True, 'name' : 'MOVIES'},
     {'enabled' : True, 'name' : 'FONTS'},
-    {'enabled' : True, 'name' : 'MENU_OTHER'},
+    {'enabled' : False, 'name' : 'MENU_OTHER'},
     {'enabled' : False, 'name' : 'MENU_WEBSEARCH'}
   ]
 
@@ -49,6 +49,7 @@ def fixSpotlight ():
   else:
     newItems = NSMutableArray.new()
     for item in items:
+      print item['name']
       missing_keys = []
       for key in REQUIRED_ITEM_KEYS:
         if not item.has_key(key):
@@ -69,6 +70,9 @@ def fixSpotlight ():
 
   CFPreferencesSetValue(PREF_NAME, newItems, BUNDLE_ID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
   CFPreferencesSynchronize(BUNDLE_ID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+
+
+  #for item in DEFAULT_VALUE
 
 def fixSafariSpotlight ():
     # Safari "Spotlight" respects the system-wide Spotlight privacy settings
